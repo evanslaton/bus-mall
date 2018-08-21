@@ -46,6 +46,29 @@ Product.currentRandomNums = function() {
   console.log('***********************************************');
 };
 
+// Renders products to the screen
+Product.renderProducts = function() {
+  Product.currentRandomNums();
+  Product.ulEl.innerHTML = '';
+
+  for (var i = 0; i < Product.numOfProductsToDisplay; i++) {
+    var ilEl = document.createElement('li');
+    var figureEl = document.createElement('figure');
+    var imgEl = document.createElement('img');
+    imgEl.src = productObjectsArray[Product.currentProductsShown[i]].path;
+    imgEl.alt = productObjectsArray[Product.currentProductsShown[i]].name;
+    var figCaptionEl = document.createElement('figcaption');
+    figCaptionEl.textContent = productObjectsArray[Product.currentProductsShown[i]].name;
+
+    Product.ulEl.appendChild(ilEl);
+    ilEl.appendChild(figureEl);
+    figureEl.appendChild(imgEl);
+    figureEl.appendChild(figCaptionEl);
+
+    productObjectsArray[Product.currentProductsShown[i]].timesShown++;
+  }
+};
+
 // Retrieves the object that was clicked on then increments its timesClicked value and totalUserClicks
 Product.clickedOn = function(event) {
   var elementClickedOn = event.target.textContent;
@@ -67,29 +90,6 @@ Product.clickedOn = function(event) {
     Product.displayData();
   } else {
     Product.renderProducts();
-  }
-};
-
-// Renders products to the screen
-Product.renderProducts = function() {
-  Product.currentRandomNums();
-  Product.ulEl.innerHTML = '';
-
-  for (var i = 0; i < Product.numOfProductsToDisplay; i++) {
-    var ilEl = document.createElement('li');
-    var figureEl = document.createElement('figure');
-    var imgEl = document.createElement('img');
-    imgEl.src = productObjectsArray[Product.currentProductsShown[i]].path;
-    imgEl.alt = productObjectsArray[Product.currentProductsShown[i]].name;
-    var figCaptionEl = document.createElement('figcaption');
-    figCaptionEl.textContent = productObjectsArray[Product.currentProductsShown[i]].name;
-
-    Product.ulEl.appendChild(ilEl);
-    ilEl.appendChild(figureEl);
-    figureEl.appendChild(imgEl);
-    figureEl.appendChild(figCaptionEl);
-
-    productObjectsArray[Product.currentProductsShown[i]].timesShown++;
   }
 };
 
