@@ -98,11 +98,6 @@ Product.clickedOn = function(event) {
 Product.displayData = function() {
   Product.ulEl.removeEventListener('click', Product.clickedOn);
   Product.ulEl.innerHTML = '';
-  // for (var i = 0; i < productObjectsArray.length; i++) {
-  //   var pEl = document.createElement('p');
-  //   pEl.textContent = `The ${productObjectsArray[i].name} was shown ${productObjectsArray[i].timesShown} times and voted for ${productObjectsArray[i].timesClicked} times.`;
-  //   Product.ulEl.appendChild(pEl);
-  // }
   gatherProductsVoteCounts();
   drawGraphOfProductsVoteCounts();
 };
@@ -204,6 +199,7 @@ var drawGraphOfProductsVoteCounts = function() {
       scales: {
         yAxes: [{
           ticks: {
+            stepSize: 1,
             beginAtZero:true
           }
         }]
