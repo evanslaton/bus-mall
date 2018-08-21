@@ -1,24 +1,80 @@
+html {
+  background: url(../img/background.jpg) no-repeat center center fixed;
+  background-size: 100% 100%;
+}
+
+body {
+  background-color: rgba(255, 255, 255, .9);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+header, footer {
+  background-color: rgb(21, 109, 192);
+  color: white;
+  box-shadow: 1px 1px 3px black;
+  height: 65px;
+}
+
+header {
+  padding: 20px 30px 0;
+}
+
+a {
+  color: white;;
+  font-size: 1.1em;
+  text-decoration: none;
+  text-shadow: 1px 1px 3px black;
+}
+
+header > a {
+  font-family: 'Righteous', Arial, Helvetica, sans-serif;
+  float: left;
+  font-size: 2.5em;
+}
+
+header ul {
+  text-align: right;
+  padding-top: 15px;
+}
+
+header li {
+  display: inline-block;
+  margin-right: 35px;
+}
+
+header li a:hover {
+  text-shadow: 3px 3px 5px black;
+}
+
+header li a:active {
+  text-shadow: 1px 1px 3px black;
+}
+
 main {
   width: 100%;
   max-width: 960px;
   margin: 0 auto;
 }
 
-li {
+main li {
   float: left;
   width: 32%;
   margin: 0 .60% 1%;
 }
 
-li:nth-child(3) {
+main li:nth-child(3) {
   margin-right: 0;
 }
 
 figure {
   border: 1px solid black;
+  background: white;
+  box-shadow: 1px 1px 3px grey;
+  border-radius: 5px;
 }
 
-img {
+main img {
+  border: 1px solid black;
   width: 80%;
   display: block;
   margin: 10px auto;
@@ -33,5 +89,12 @@ img {
 figCaption {
   text-transform: capitalize;
   text-align: center;
-  padding: 5px;
+  font-size: 1.5em;
+  padding: 10px 0 20px;
+}
+
+canvas {
+  background-color: white;
+  padding: 25px;
+  border-radius: 5px;
 }

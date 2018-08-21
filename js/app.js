@@ -20,6 +20,7 @@ Product.numOfProductsToDisplay = 3;
 Product.ulEl = document.getElementById('product-images');
 Product.previousProductsShown = [];
 Product.currentProductsShown = [];
+Product.productsVoteCounts = [];
 Product.totalUserClicks = 0;
 Product.productNameArray = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
 
@@ -97,11 +98,15 @@ Product.clickedOn = function(event) {
 Product.displayData = function() {
   Product.ulEl.removeEventListener('click', Product.clickedOn);
   Product.ulEl.innerHTML = '';
-  for (var i = 0; i < productObjectsArray.length; i++) {
-    var pEl = document.createElement('p');
-    pEl.textContent = `The ${productObjectsArray[i].name} was shown ${productObjectsArray[i].timesShown} times and voted for ${productObjectsArray[i].timesClicked} times.`;
-    Product.ulEl.appendChild(pEl);
-  }
+  gatherProductsVoteCounts();
+  drawGraphOfProductsVoteCounts();
+};
+
+// Adds products vote counts to the Product.productsVoteCounts arrays
+var gatherProductsVoteCounts = function() {
+  productObjectsArray.forEach(function(product) {
+    Product.productsVoteCounts.push(product.timesClicked);
+  });
 };
 
 // IIFE that creates a new object for each product using the constructor function
@@ -116,4 +121,89 @@ Product.ulEl.addEventListener('click', Product.clickedOn);
 
 Product.renderProducts();
 
+// Graph information
+var red = 'rgba(255, 99, 132, 0.2)';
+var blue = 'rgba(54, 162, 235, 0.2)';
+var yellow = 'rgba(255, 206, 86, 0.2)';
+var green = 'rgba(75, 192, 192, 0.2)';
+var purple = 'rgba(153, 102, 255, 0.2)';
 
+var redBorder = 'rgba(255, 99, 132, 1)';
+var blueBorder = 'rgba(54, 162, 235, 1)';
+var yellowBorder = 'rgba(255, 206, 86, 1)';
+var greenBorder = 'rgba(75, 192, 192, 1)';
+var purpleBorder = 'rgba(153, 102, 255, 1)';
+
+var drawGraphOfProductsVoteCounts = function() {
+  var graphOfProductVoteCounts = document.getElementById('graph-content');
+  var ctx = graphOfProductVoteCounts.getContext('2d');
+  var productVoteCountsGraph = new Chart(ctx, {
+    type: 'bar',
+    maintainAspectRatio: true,
+    data: {
+      labels: Product.productNameArray,
+      datasets: [{
+        label: 'Number of Votes',
+        data: Product.productsVoteCounts,
+        backgroundColor: [
+          red,
+          blue,
+          yellow,
+          green,
+          purple,
+          red,
+          blue,
+          yellow,
+          green,
+          purple,
+          red,
+          blue,
+          yellow,
+          green,
+          purple,
+          red,
+          blue,
+          yellow,
+          green,
+          purple,
+        ],
+        borderColor: [
+          redBorder,
+          blueBorder,
+          yellowBorder,
+          greenBorder,
+          purpleBorder,
+          redBorder,
+          blueBorder,
+          yellowBorder,
+          greenBorder,
+          purpleBorder,
+          redBorder,
+          blueBorder,
+          yellowBorder,
+          greenBorder,
+          purpleBorder,
+          redBorder,
+          blueBorder,
+          yellowBorder,
+          greenBorder,
+          purpleBorder,
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      legend: {
+        display: false
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            stepSize: 1,
+            beginAtZero:true
+          }
+        }]
+      }
+    }
+  });
+};
