@@ -1,100 +1,84 @@
 'use strict';
 
 // Declare array to store objects created via constructor function
-// Vinicio - Remove array from name
-var productObjectsArray = [];
+var allProducts = [];
 
-// Constructor function
+// Constructor function that create an object for each product
 function Product(name) {
   this.name = name;
   this.path = `img/${name}.jpg`;
   this.timesClicked = 0;
-  this.timesShown = 0;
-  // Vinicio - (smell) - this code is trying to do too much
-  //           creating a product AND maintaining a list of products
-  productObjectsArray.push(this);
+  this.timesDisplayed = 0;
 }
 
-// Vinicio - you can have an empty constructor
-// function UiController(){
-// }
-
-// Product.objects = [];
+// Constructor function that will contain all data the user will interact with
+function UiController(){}
 
 // Determines how many products to display
 /* ============================ */
-Product.numOfProductsToDisplay = 3;
+UiController.NUMBER_OF_PRODUCTS_TO_DISPLAY = 3;
 /* ============================ */
 
-// vinicio - I'm not sure if these variables need to be on the Product object
-//         - you could do something like
-// var uiControl = {
-//   totalUserClicks: 0,
-// };
-Product.ulEl = document.getElementById('product-images');
-Product.previousProductsShown = [];
-Product.currentProductsShown = [];
-Product.productsVoteCounts = [];
-Product.totalUserClicks = 0;
-Product.productNameArray = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
+UiController.ulEl = document.getElementById('product-images');
+UiController.previousProductsShown = [];
+UiController.currentProductsShown = [];
+UiController.productsVoteCounts = [];
+UiController.TOTAL_USER_CLICKS = 0;
+UiController.NUMBER_OF_TIMES_VOTES = 25;
+UiController.productNames = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
 
 // Generates a random number
-// Vinicio - functions CAN be on the global scope
-Product.getRandomNum = function() {
-  return Math.floor(Math.random() * Product.productNameArray.length);
+var getRandomNumber = function() {
+  return Math.floor(Math.random() * UiController.productNames.length);
 };
 
 // Generates unique random numbers that are different than the previous unique random numbers
-// Vinicio - this function, though, can be on the product since it's specific to the product 
-//         - in can also be on your uiControl object/constructor
-Product.currentRandomNums = function() {
-  var randomNum; // vinicio - some people will complain about num
-  Product.previousProductsShown = Product.currentProductsShown;
-  Product.currentProductsShown = [];
+UiController.getUniqueRandomNumbers = function() {
+  var randomNumer;
+  UiController.previousProductsShown = UiController.currentProductsShown;
+  UiController.currentProductsShown = [];
 
   // Makes sure the new randomly generated number is not a duplicate
-  while (Product.currentProductsShown.length < Product.numOfProductsToDisplay) {
-    randomNum = Product.getRandomNum();
-    // Vinicio - people will frown upon lines greater than 100 characters
-    if (Product.currentProductsShown.indexOf(randomNum) === -1 && 
-    Product.previousProductsShown.indexOf(randomNum) === -1) {
-      Product.currentProductsShown.push(randomNum);
+  while (UiController.currentProductsShown.length < UiController.NUMBER_OF_PRODUCTS_TO_DISPLAY) {
+    randomNumer = getRandomNumber();
+    if (UiController.currentProductsShown.indexOf(randomNumer) === -1 &&
+    UiController.previousProductsShown.indexOf(randomNumer) === -1) {
+      UiController.currentProductsShown.push(randomNumer);
     }
   }
-  console.log('Previous', Product.previousProductsShown);
-  console.log('Current', Product.currentProductsShown);
-  console.log('***********************************************');
 };
 
 // Renders products to the screen
 // Vinicio - I would create the uiController constructor and put all these functions here
-Product.renderProducts = function() {
-  Product.currentRandomNums();
-  Product.ulEl.innerHTML = '';
+UiController.renderProducts = function() {
+  UiController.getUniqueRandomNumbers();
+  UiController.ulEl.innerHTML = '';
 
-  // Vinicio - I like the placement of the var inside the for loop
-  //         - you could extract the string literals to their own separate variables
-  // var FIGURE = 'figure';
-  for (var i = 0; i < Product.numOfProductsToDisplay; i++) {
-    var ilEl = document.createElement('li');
-    var figureEl = document.createElement('figure');
-    var imgEl = document.createElement('img');
-    imgEl.src = productObjectsArray[Product.currentProductsShown[i]].path;
-    imgEl.alt = productObjectsArray[Product.currentProductsShown[i]].name;
-    var figCaptionEl = document.createElement('figcaption');
-    figCaptionEl.textContent = productObjectsArray[Product.currentProductsShown[i]].name;
+  var LI = 'li';
+  var FIGURE = 'figure';
+  var IMG = 'img';
+  var FIGCAPTION = 'figcaption';
 
-    Product.ulEl.appendChild(ilEl);
+  for (var i = 0; i < UiController.NUMBER_OF_PRODUCTS_TO_DISPLAY; i++) {
+    var ilEl = document.createElement(LI);
+    var figureEl = document.createElement(FIGURE);
+    var imgEl = document.createElement(IMG);
+    imgEl.src = allProducts[UiController.currentProductsShown[i]].path;
+    imgEl.alt = allProducts[UiController.currentProductsShown[i]].name;
+    var figCaptionEl = document.createElement(FIGCAPTION);
+    figCaptionEl.textContent = allProducts[UiController.currentProductsShown[i]].name;
+
+    UiController.ulEl.appendChild(ilEl);
     ilEl.appendChild(figureEl);
     figureEl.appendChild(imgEl);
     figureEl.appendChild(figCaptionEl);
 
-    productObjectsArray[Product.currentProductsShown[i]].timesShown++;
+    allProducts[UiController.currentProductsShown[i]].timesDisplayed++;
   }
 };
 
 // Retrieves the object that was clicked on then increments its timesClicked value and totalUserClicks
-Product.clickedOn = function(event) {
+UiController.clickedOn = function(event) {
   var elementClickedOn = event.target.textContent;
 
   if (!elementClickedOn) {
@@ -102,79 +86,69 @@ Product.clickedOn = function(event) {
   }
 
   // Returns an array with one value, the object that was clicked on
-  var objectToUpdate = productObjectsArray.filter(function(object) {
+  var objectToUpdate = allProducts.filter(function(object) {
     return object.name === elementClickedOn;
   });
 
-  // Vinicio - magic number
   objectToUpdate[0].timesClicked++;
-  Product.totalUserClicks++;
+  UiController.TOTAL_USER_CLICKS++;
 
   // Checks to see if the user has more clicks and terminates the program if not
-  // Vinicio - (magic number)
-  if (Product.totalUserClicks === 25) {
-    Product.displayData();
+  if (UiController.TOTAL_USER_CLICKS === UiController.NUMBER_OF_TIMES_VOTES) {
+    UiController.ulEl.removeEventListener('click', UiController.clickedOn);
+    UiController.ulEl.innerHTML = '';
+    UiController.gatherProductsVoteCounts();
+    drawGraphOfProductsVoteCounts();
   } else {
-    Product.renderProducts();
+    UiController.renderProducts();
   }
 };
 
-// Displays end data
-Product.displayData = function() {
-  Product.ulEl.removeEventListener('click', Product.clickedOn);
-  Product.ulEl.innerHTML = '';
-  gatherProductsVoteCounts();
-  drawGraphOfProductsVoteCounts();
-};
-
-// Adds products vote counts to the Product.productsVoteCounts arrays
-var gatherProductsVoteCounts = function() {
-  productObjectsArray.forEach(function(product) {
-    Product.productsVoteCounts.push(product.timesClicked);
+// Adds products vote counts to the UiController.productsVoteCounts arrays
+UiController.gatherProductsVoteCounts = function() {
+  allProducts.forEach(function(product) {
+    UiController.productsVoteCounts.push(product.timesClicked);
   });
 };
 
 // IIFE that creates a new object for each product using the constructor function
 (function() {
-  Product.productNameArray.forEach(function(product) {
-    return new Product(product);
-    // Vinicio - this would fix the smell in line 13-14
-    // productObjectArray.push();
+  UiController.productNames.forEach(function(product) {
+    allProducts.push(new Product(product));
   });
+
+  // Binds clickedOn to ulEl
+  UiController.ulEl.addEventListener('click', UiController.clickedOn);
+
+  UiController.renderProducts();
 })();
 
-// Binds clickedOn to ulEl
-// Vinicio - this could be moved into the iife OR the contents of the iife could be moved here
-Product.ulEl.addEventListener('click', Product.clickedOn);
-Product.renderProducts();
-
 // Graph information
-// Vinicio - great code
-var red = 'rgba(255, 99, 132, 0.2)';
-var blue = 'rgba(54, 162, 235, 0.2)';
-var yellow = 'rgba(255, 206, 86, 0.2)';
-var green = 'rgba(75, 192, 192, 0.2)';
-var purple = 'rgba(153, 102, 255, 0.2)';
-
-var redBorder = 'rgba(255, 99, 132, 1)';
-var blueBorder = 'rgba(54, 162, 235, 1)';
-var yellowBorder = 'rgba(255, 206, 86, 1)';
-var greenBorder = 'rgba(75, 192, 192, 1)';
-var purpleBorder = 'rgba(153, 102, 255, 1)';
-
 var drawGraphOfProductsVoteCounts = function() {
-  // Vinicio - here you could extract all the string literals
-  var graphOfProductVoteCounts = document.getElementById('graph-content');
-  var ctx = graphOfProductVoteCounts.getContext('2d');
-  // Vinicio - I don't like the name ctx, I prefer context
-  var productVoteCountsGraph = new Chart(ctx, {
+  var GRAPH_CONTENT = 'graph-content';
+  var TWO_D = '2d';
+  var red = 'rgba(255, 99, 132, 0.2)';
+  var blue = 'rgba(54, 162, 235, 0.2)';
+  var yellow = 'rgba(255, 206, 86, 0.2)';
+  var green = 'rgba(75, 192, 192, 0.2)';
+  var purple = 'rgba(153, 102, 255, 0.2)';
+  var redBorder = 'rgba(255, 99, 132, 1)';
+  var blueBorder = 'rgba(54, 162, 235, 1)';
+  var yellowBorder = 'rgba(255, 206, 86, 1)';
+  var greenBorder = 'rgba(75, 192, 192, 1)';
+  var purpleBorder = 'rgba(153, 102, 255, 1)';
+
+  var graphOfProductVoteCounts = document.getElementById(GRAPH_CONTENT);
+  var context = graphOfProductVoteCounts.getContext(TWO_D);
+
+  new Chart(context, { // eslint-disable-line
     type: 'bar',
     maintainAspectRatio: true,
     data: {
-      labels: Product.productNameArray,
+      labels: UiController.productNames,
       datasets: [{
         label: 'Number of Votes',
-        data: Product.productsVoteCounts,
+        data: UiController.productsVoteCounts,
         backgroundColor: [
           red,
           blue,
