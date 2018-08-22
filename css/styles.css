@@ -114,12 +114,6 @@ ul + p {
   margin-top: 35px;
 }
 
-main div {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-}
-
 canvas {
   padding: 10px 0 0;
   border-radius: 5px;

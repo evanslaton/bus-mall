@@ -8,7 +8,7 @@ function Product(name) {
   this.name = name;
   this.path = `img/${name}.jpg`;
   this.timesClicked = 0;
-  this.timesDisplayed = 0;
+  this.timesDisplayed = 0; // This property is not in use
 }
 
 // Constructor function that will contain all data the user will interact with
@@ -20,18 +20,14 @@ UiController.NUMBER_OF_PRODUCTS_TO_DISPLAY = 3;
 /* ============================ */
 
 UiController.ulEl = document.getElementById('product-images');
+UiController.spanEl = document.getElementById('votes');
 UiController.graphOfProductVoteCounts = document.getElementById('graph-content');
 UiController.previousProductsShown = [];
 UiController.currentProductsShown = [];
 UiController.productsVoteCounts = [];
-UiController.TOTAL_USER_CLICKS = 0;
-UiController.NUMBER_OF_TIMES_VOTES = 25;
+UiController.totalUserClicks = 0;
+UiController.MAX_VOTES = 25;
 UiController.productNames = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
-
-// Generates a random number
-var getRandomNumber = function() {
-  return Math.floor(Math.random() * UiController.productNames.length);
-};
 
 // Generates unique random numbers that are different than the previous unique random numbers
 UiController.getUniqueRandomNumbers = function() {
@@ -50,7 +46,6 @@ UiController.getUniqueRandomNumbers = function() {
 };
 
 // Renders products to the screen
-// Vinicio - I would create the uiController constructor and put all these functions here
 UiController.renderProducts = function() {
   UiController.getUniqueRandomNumbers();
   UiController.ulEl.innerHTML = '';
@@ -81,7 +76,6 @@ UiController.renderProducts = function() {
 // Retrieves the object that was clicked on then increments its timesClicked value and totalUserClicks
 UiController.clickedOn = function(event) {
   var elementClickedOn = event.target.textContent;
-
   if (!elementClickedOn) {
     elementClickedOn = event.target.alt;
   }
@@ -92,20 +86,10 @@ UiController.clickedOn = function(event) {
   });
 
   objectToUpdate[0].timesClicked++;
-  UiController.TOTAL_USER_CLICKS++;
+  UiController.totalUserClicks++;
 
   UiController.updateTimesClickedToLocalStorage();
-
-  // Checks to see if the user has more clicks and terminates the program if not
-  if (UiController.TOTAL_USER_CLICKS === UiController.NUMBER_OF_TIMES_VOTES) {
-    UiController.ulEl.removeEventListener('click', UiController.clickedOn);
-    UiController.ulEl.innerHTML = '';
-    // UiController.gatherProductsVoteCounts();
-    UiController.changeElementStyles();
-    drawGraphOfProductsVoteCounts();
-  } else {
-    UiController.renderProducts();
-  }
+  UiController.checkIfFinishedVoting();
 };
 
 // Adds products vote counts to the UiController.productsVoteCounts array
@@ -132,26 +116,48 @@ UiController.updateTimesClickedToLocalStorage = function() {
   localStorage.setItem('voteCounts', JSON.stringify(UiController.productsVoteCounts));
 };
 
-// IIFE that calls all starter functions
-(function() {
-  // Creates a new object for each product using the constructor function
-  UiController.productNames.forEach(function(product) {
-    allProducts.push(new Product(product));
-  });
-
-  // Binds clickedOn to ulEl
-  UiController.ulEl.addEventListener('click', UiController.clickedOn);
-
-  // Renders product images
-  UiController.renderProducts();
-
-  // If 'voteCounts' is in localStorage, updates the timesClicked values on each object
+// If 'voteCounts' is in localStorage, updates the timesClicked values on each object
+UiController.updateVoteCountsWithLocalStorage = function() {
   var storedProductVoteCounts =  JSON.parse(localStorage.getItem('voteCounts'));
   if (storedProductVoteCounts !== null) {
     for (var i = 0; i < allProducts.length; i++) {
       allProducts[i].timesClicked = storedProductVoteCounts[i];
     }
   }
+};
+
+// Displays the graph if the user is done voting
+UiController.checkIfFinishedVoting = function() {
+  if (UiController.totalUserClicks === UiController.MAX_VOTES) {
+    UiController.ulEl.removeEventListener('click', UiController.clickedOn);
+    UiController.ulEl.innerHTML = '';
+    // UiController.gatherProductsVoteCounts();
+    UiController.changeElementStyles();
+    drawGraphOfProductsVoteCounts();
+  } else {
+    UiController.renderProducts();
+  }
+};
+
+// Generates a random number
+var getRandomNumber = function() {
+  return Math.floor(Math.random() * UiController.productNames.length);
+};
+
+// Starts the app
+(function() {
+  // Creates a new object for each product using the constructor function
+  UiController.productNames.forEach(function(product) {
+    allProducts.push(new Product(product));
+  });
+
+  UiController.spanEl.textContent = UiController.MAX_VOTES;
+
+  // Binds clickedOn to ulEl
+  UiController.ulEl.addEventListener('click', UiController.clickedOn);
+
+  UiController.renderProducts();
+  UiController.updateVoteCountsWithLocalStorage();
 })();
 
 // Graph information
