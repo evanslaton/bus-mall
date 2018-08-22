@@ -20,6 +20,7 @@ UiController.NUMBER_OF_PRODUCTS_TO_DISPLAY = 3;
 /* ============================ */
 
 UiController.ulEl = document.getElementById('product-images');
+UiController.graphOfProductVoteCounts = document.getElementById('graph-content');
 UiController.previousProductsShown = [];
 UiController.currentProductsShown = [];
 UiController.productsVoteCounts = [];
@@ -93,26 +94,47 @@ UiController.clickedOn = function(event) {
   objectToUpdate[0].timesClicked++;
   UiController.TOTAL_USER_CLICKS++;
 
+  UiController.updateTimesClickedToLocalStorage();
+
   // Checks to see if the user has more clicks and terminates the program if not
   if (UiController.TOTAL_USER_CLICKS === UiController.NUMBER_OF_TIMES_VOTES) {
     UiController.ulEl.removeEventListener('click', UiController.clickedOn);
     UiController.ulEl.innerHTML = '';
-    UiController.gatherProductsVoteCounts();
+    // UiController.gatherProductsVoteCounts();
+    UiController.changeElementStyles();
     drawGraphOfProductsVoteCounts();
   } else {
     UiController.renderProducts();
   }
 };
 
-// Adds products vote counts to the UiController.productsVoteCounts arrays
+// Adds products vote counts to the UiController.productsVoteCounts array
 UiController.gatherProductsVoteCounts = function() {
+  UiController.productsVoteCounts = [];
   allProducts.forEach(function(product) {
     UiController.productsVoteCounts.push(product.timesClicked);
   });
 };
 
-// IIFE that creates a new object for each product using the constructor function
+// Changes styles of the canvas and main > p elements to be used when the user finishes voting
+UiController.changeElementStyles = function() {
+  var instructionPEl = document.getElementById('instructions-to-user');
+  var resultsPEl = document.getElementById('results-graph-label');
+
+  UiController.graphOfProductVoteCounts.style.display = 'block';
+  instructionPEl.style.display = 'none';
+  resultsPEl.style.display = 'block';
+};
+
+// Calculates product vote counts and sends to localStorage
+UiController.updateTimesClickedToLocalStorage = function() {
+  UiController.gatherProductsVoteCounts();
+  localStorage.setItem('voteCounts', JSON.stringify(UiController.productsVoteCounts));
+};
+
+// IIFE that calls all starter functions
 (function() {
+  // Creates a new object for each product using the constructor function
   UiController.productNames.forEach(function(product) {
     allProducts.push(new Product(product));
   });
@@ -120,12 +142,20 @@ UiController.gatherProductsVoteCounts = function() {
   // Binds clickedOn to ulEl
   UiController.ulEl.addEventListener('click', UiController.clickedOn);
 
+  // Renders product images
   UiController.renderProducts();
+
+  // If 'voteCounts' is in localStorage, updates the timesClicked values on each object
+  var storedProductVoteCounts =  JSON.parse(localStorage.getItem('voteCounts'));
+  if (storedProductVoteCounts !== null) {
+    for (var i = 0; i < allProducts.length; i++) {
+      allProducts[i].timesClicked = storedProductVoteCounts[i];
+    }
+  }
 })();
 
 // Graph information
 var drawGraphOfProductsVoteCounts = function() {
-  var GRAPH_CONTENT = 'graph-content';
   var TWO_D = '2d';
   var red = 'rgba(255, 99, 132, 0.2)';
   var blue = 'rgba(54, 162, 235, 0.2)';
@@ -138,14 +168,13 @@ var drawGraphOfProductsVoteCounts = function() {
   var greenBorder = 'rgba(75, 192, 192, 1)';
   var purpleBorder = 'rgba(153, 102, 255, 1)';
 
-  var graphOfProductVoteCounts = document.getElementById(GRAPH_CONTENT);
-  var context = graphOfProductVoteCounts.getContext(TWO_D);
+  var context = UiController.graphOfProductVoteCounts.getContext(TWO_D);
 
   new Chart(context, { // eslint-disable-line
     type: 'bar',
-    maintainAspectRatio: true,
     data: {
       labels: UiController.productNames,
+      responsive: true,
       datasets: [{
         label: 'Number of Votes',
         data: UiController.productsVoteCounts,

@@ -30,13 +30,15 @@
   </header>
   <main>
     <h1>Market Research</h1>
-    <p>Consumer, below is a catalog of assorted, high-markup products designed to a captivate passengers seeking a mental escape from the drudgery of travel. Please click on the product shown that you are most likely to purchase. After 25 selections you will be shown a graph detailing how often you clicked on each product.</p>
+    <p id="instructions-to-user">Consumer, below is a catalog of assorted, high-markup products designed to a captivate passengers seeking a mental escape from the drudgery of travel. Please click on the product shown that you are most likely to purchase. After 25 selections you will be shown a graph detailing how often you clicked on each product.</p>
     <ul id="product-images"></ul>
 
-    <p>Consumer, here is a graph detailing how often you clicked on each product.</p>
-    <canvas id="graph-content" width="" height="">
-      <p>Unable to display at this time.</p>
-    </canvas>
+    <p id="results-graph-label">Consumer, here is a graph detailing how often you clicked on each product.</p>
+    <div id="canvas-parent">
+      <canvas id="graph-content" width="960" height="">
+        <p>Unable to display at this time.</p>
+      </canvas>
+    </div>
   </main>
 
   <footer>
