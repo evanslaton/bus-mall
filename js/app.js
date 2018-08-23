@@ -12,7 +12,7 @@ function Product(name) {
 }
 
 // Constructor function that will contain all data the user will interact with
-function UiController(){}
+var UiController = {};
 
 // Determines how many products to display
 /* ============================ */
@@ -25,7 +25,6 @@ UiController.graphOfProductVoteCounts = document.getElementById('graph-content')
 UiController.previousProductsShown = [];
 UiController.currentProductsShown = [];
 UiController.productsVoteCounts = [];
-UiController.totalUserClicks = 0;
 UiController.MAX_VOTES = 25;
 UiController.productNames = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
 
@@ -73,7 +72,7 @@ UiController.renderProducts = function() {
   }
 };
 
-// Retrieves the object that was clicked on then increments its timesClicked value and totalUserClicks
+// Retrieves the object that was clicked on then increments its timesClicked value
 UiController.clickedOn = function(event) {
   var elementClickedOn = event.target.textContent;
   if (!elementClickedOn) {
@@ -86,7 +85,6 @@ UiController.clickedOn = function(event) {
   });
 
   objectToUpdate[0].timesClicked++;
-  UiController.totalUserClicks++;
 
   UiController.updateTimesClickedToLocalStorage();
   UiController.checkIfFinishedVoting();
@@ -119,21 +117,28 @@ UiController.updateTimesClickedToLocalStorage = function() {
 // If 'voteCounts' is in localStorage, updates the timesClicked values on each object
 UiController.updateVoteCountsWithLocalStorage = function() {
   var storedProductVoteCounts =  JSON.parse(localStorage.getItem('voteCounts'));
-  if (storedProductVoteCounts !== null) {
+  if (storedProductVoteCounts !== null && storedProductVoteCounts.length > 0) {
     for (var i = 0; i < allProducts.length; i++) {
       allProducts[i].timesClicked = storedProductVoteCounts[i];
     }
   }
 };
 
+
 // Displays the graph if the user is done voting
 UiController.checkIfFinishedVoting = function() {
-  if (UiController.totalUserClicks === UiController.MAX_VOTES) {
+  var totalUserClicks = UiController.productsVoteCounts.reduce(function(accumulator, currentValue) {
+    return accumulator + currentValue;
+  });
+
+  if (totalUserClicks === UiController.MAX_VOTES) {
     UiController.ulEl.removeEventListener('click', UiController.clickedOn);
     UiController.ulEl.innerHTML = '';
     // UiController.gatherProductsVoteCounts();
     UiController.changeElementStyles();
     drawGraphOfProductsVoteCounts();
+    UiController.productsVoteCounts = [];
+    localStorage.setItem('voteCounts', JSON.stringify(UiController.productsVoteCounts));
   } else {
     UiController.renderProducts();
   }
